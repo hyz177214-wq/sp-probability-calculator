@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f2eb">
+  <title>SP牌概率计算器</title>
+  <style>
+    :root{color-scheme:light;--ink:#17241f;--muted:#69756e;--line:#e2e7df;--green:#24634b;--green-dark:#184c38;--mint:#eaf3ec;--paper:#fffefa;--bg:#f5f2eb;--orange:#bd6a33;--red:#a64438;--shadow:0 18px 52px #23332912}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 85% 5%,#e8eee5 0,transparent 36%),var(--bg);color:var(--ink);font:16px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif}
+    .wrap{width:min(100% - 32px,1040px);margin:0 auto;padding:44px 0 64px}.hero{display:grid;grid-template-columns:1fr auto;align-items:end;gap:24px;margin-bottom:25px}.eyebrow{font-size:12px;font-weight:750;letter-spacing:.15em;text-transform:uppercase;color:var(--green);margin:0 0 10px}.hero h1{font-size:clamp(30px,5vw,46px);line-height:1.08;letter-spacing:-.045em;margin:0}.intro{max-width:600px;margin:13px 0 0;color:var(--muted)}.deckmark{width:78px;height:78px;border-radius:25px;background:var(--green);color:white;display:grid;place-items:center;box-shadow:0 10px 24px #24634b30}.deckmark svg{width:42px;height:42px}
+    .layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr);gap:18px;align-items:start}.card{background:var(--paper);border:1px solid #e7e8df;border-radius:22px;box-shadow:var(--shadow)}.maincard{padding:25px}.side{display:grid;gap:18px}.result{padding:24px;position:sticky;top:18px;overflow:hidden}.result:before{content:"";position:absolute;inset:0 0 auto;height:4px;background:linear-gradient(90deg,#24634b,#82aa82)}
+    .section-head{display:flex;justify-content:space-between;align-items:start;gap:18px}.step{font-size:11px;color:var(--green);font-weight:800;letter-spacing:.11em}.section-head h2,.result h2{font-size:20px;letter-spacing:-.025em;margin:3px 0 0}.hint{font-size:13px;color:var(--muted);margin:5px 0 0}.field-label{display:block;font-size:14px;font-weight:700;margin:22px 0 9px}.counter{display:flex;align-items:center;gap:12px}.counter button{width:42px;height:42px;border-radius:13px;border:1px solid var(--line);background:#fff;color:var(--ink);font-size:22px;cursor:pointer}.counter button:hover{background:var(--mint);border-color:#b8d0bf}.counter input{width:72px;height:42px;border:1px solid var(--line);border-radius:12px;text-align:center;font:700 19px ui-sans-serif,system-ui,sans-serif;color:var(--ink);background:#fff}.counter .suffix{color:var(--muted);font-size:14px}.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}.pill{background:#f2f4ef;border:1px solid #e7ebe4;padding:5px 10px;border-radius:999px;color:#526157;font-size:12px}.pill b{color:var(--ink)}
+    .drawbox{margin-top:26px;padding-top:22px;border-top:1px solid var(--line)}.draw-actions{display:flex;gap:10px;margin-top:15px}.action{border:0;border-radius:13px;padding:12px 15px;font-size:14px;font-weight:750;cursor:pointer;transition:transform .12s,background .12s}.action:active{transform:scale(.98)}.special{background:var(--green);color:white}.special:hover{background:var(--green-dark)}.ordinary{background:#f0f2ed;color:#314139}.ordinary:hover{background:#e5eae2}.undo{background:transparent;color:var(--muted);border:1px solid var(--line);padding:9px 11px;font-size:12px}.undo:hover{color:var(--ink);background:#f7f8f4}.draw-actions .action{flex:1}.button-row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:17px}.draw-limit{font-size:12px;color:var(--muted)}
+    .statlabel{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.04em;margin:22px 0 2px}.prob{font-size:clamp(50px,8vw,70px);font-weight:760;letter-spacing:-.065em;line-height:1.08;color:var(--green);font-variant-numeric:tabular-nums}.fraction{font:12px ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--muted);margin-top:6px;overflow-wrap:anywhere}.meter{height:9px;background:#edf0e9;border-radius:99px;margin:19px 0 18px;overflow:hidden}.meter span{display:block;height:100%;width:0;background:linear-gradient(90deg,#24634b,#8fb291);border-radius:99px;transition:width .25s ease}.result-copy{font-size:14px;color:#425048;margin:0}.mini-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:19px}.mini{background:#f6f7f3;border:1px solid #edf0e9;border-radius:14px;padding:11px 12px}.mini span{display:block;color:var(--muted);font-size:11px}.mini strong{display:block;font-size:16px;margin-top:2px;font-variant-numeric:tabular-nums}.history{padding:21px 22px}.history-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.history-head h2{font-size:16px;margin:0}.history-list{margin:13px 0 0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:7px;min-height:31px}.draw-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 9px;font-size:11px;color:#46564d}.draw-chip i{width:7px;height:7px;border-radius:50%;background:var(--green)}.draw-chip.ordinary-chip i{background:#9ca89f}.empty{font-size:12px;color:#89938c;padding-top:5px}.method{padding:20px 22px}.method h2{font-size:15px;margin:0 0 9px}.method p{font-size:12px;color:#647168;margin:6px 0}.formula{margin:11px 0 5px;padding:11px 12px;border-radius:12px;background:#f3f6f1;color:#263d31;font:12px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}.note{font-size:11px!important;color:#8a6b51!important}.warn{display:none;margin-top:13px;padding:9px 11px;border-radius:10px;background:#fcf0ec;color:var(--red);font-size:12px}.warn.show{display:block}.foot{font-size:11px;color:#8a938c;text-align:center;margin-top:22px}
+    @media(max-width:760px){.wrap{padding-top:30px}.layout{grid-template-columns:1fr}.result{position:static;grid-row:1}.hero{grid-template-columns:1fr auto}.deckmark{width:60px;height:60px;border-radius:19px}.maincard{padding:21px}.prob{font-size:58px}}
+    @media(max-width:430px){.wrap{width:min(100% - 22px,1040px)}.hero{gap:12px}.deckmark{width:50px;height:50px}.deckmark svg{width:31px}.card{border-radius:18px}.draw-actions{gap:7px}.action{padding:11px 9px;font-size:13px}.button-row{align-items:flex-start;flex-direction:column}.counter{gap:8px}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header class="hero">
+      <div><p class="eyebrow">DECK ODDS · 50 CARDS</p><h1>SP牌概率计算器</h1><p class="intro">告诉我起手拿到几张SP牌，再记录你之后抽到的牌。右侧会更新：预先放在一边的 7 张里，至少有一张SP牌的精确概率。</p></div>
+      <div class="deckmark" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><rect x="11" y="7" width="26" height="34" rx="5" stroke="currentColor" stroke-width="2.5"/><path d="M18 17h12M18 23h12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><path d="m24 28 1.6 3.2 3.5.5-2.55 2.5.6 3.5-3.15-1.65-3.15 1.65.6-3.5-2.55-2.5 3.5-.5L24 28Z" fill="currentColor"/></svg></div>
+    </header>
+    <div class="layout">
+      <section class="card maincard" aria-labelledby="setup-title">
+        <div class="section-head"><div><span class="step">01 / 起手</span><h2 id="setup-title">你的 7 张手牌里有几张SP牌？</h2><p class="hint">输入已知数量，范围是 0 到 4 张。</p></div></div>
+        <label class="field-label" for="handCount">起手SP牌数量</label>
+        <div class="counter"><button type="button" id="minus" aria-label="减少一张">−</button><input id="handCount" type="number" min="0" max="4" value="0" inputmode="numeric"><button type="button" id="plus" aria-label="增加一张">+</button><span class="suffix">张SP牌</span></div>
+        <div class="meta"><span class="pill">总牌数 <b>50</b></span><span class="pill">SP牌 <b>4</b></span><span class="pill">普通牌 <b>46</b></span></div>
+        <div class="drawbox">
+          <div class="section-head"><div><span class="step">02 / 后续抽牌</span><h2>记录每一次抽到的牌</h2><p class="hint">抽到SP牌或普通牌，点一下即可更新概率。</p></div></div>
+          <div class="draw-actions"><button class="action special" id="drawSpecial" type="button">✦ 抽到SP牌</button><button class="action ordinary" id="drawOrdinary" type="button">抽到普通牌</button></div>
+          <div class="button-row"><button class="action undo" id="undo" type="button">撤销上一次</button><span class="draw-limit" id="drawLimit">还可记录 36 次抽牌</span></div>
+          <div class="warn" id="warning" role="status"></div>
+        </div>
+      </section>
+      <div class="side">
+        <section class="card result" aria-labelledby="result-title" aria-live="polite">
+          <span class="step">实时条件概率</span><h2 id="result-title">旁边 7 张至少有 1 张SP牌</h2>
+          <p class="statlabel">当前概率</p><div class="prob" id="probability">—</div><div class="fraction" id="fraction">等待输入</div>
+          <div class="meter" aria-label="概率进度"><span id="meterFill"></span></div><p class="result-copy" id="resultCopy"></p>
+          <div class="mini-stats"><div class="mini"><span>已记录抽牌</span><strong id="drawCount">0 次</strong></div><div class="mini"><span>其中SP牌</span><strong id="specialCount">0 张</strong></div><div class="mini"><span>未看牌堆</span><strong id="unknownCount">43 张</strong></div><div class="mini"><span>未看SP牌</span><strong id="remainingSpecial">4 张</strong></div></div>
+        </section>
+        <section class="card history"><div class="history-head"><h2>抽牌记录</h2><button class="action undo" id="reset" type="button">重置</button></div><ol class="history-list" id="history" aria-label="抽牌记录"></ol></section>
+        <section class="card method"><h2>计算方式与假设</h2><p>50 张牌中有 4 张SP牌。起手抽 7 张并查看其中数量 (h)，接着把牌堆顶部 7 张放在一边且不查看。之后的牌视为从余下的牌中随机抽取。</p><p>记录 (k) 次后，若其中有 (s) 张SP牌，则未看牌池有 (43-k) 张，其中 (4-h-s) 张SP牌。未看牌池包含那组被放在一边的 7 张。</p><div class="formula">P(≥1) = 1 − C(39 − h + s, 7) / C(43 − k, 7)</div><p class="note">前提：被放在一边的牌尚未翻开；抽牌结果只来自其他可见牌。假设没有洗回、额外弃牌或替换牌。</p></section>
+      </div>
+    </div>
+    <footer class="foot">如果你后来查看或翻开了被放在一边的牌，这个计算条件就会改变。</footer>
+  </main>
+  <script>
+    (()=>{
+      const hand=document.getElementById('handCount'), historyEl=document.getElementById('history'), warning=document.getElementById('warning');
+      let draws=[];
+      const clampHand=()=>{let n=Number.parseInt(hand.value,10);if(!Number.isFinite(n))n=0;n=Math.max(0,Math.min(4,n));hand.value=String(n);return n};
+      const choose=(n,r)=>{if(r<0||n<r||n<0)return 0;r=Math.min(r,n-r);let x=1;for(let i=1;i<=r;i++)x=x*(n-r+i)/i;return x};
+      const fmt=n=>new Intl.NumberFormat('zh-CN',{maximumFractionDigits:2}).format(n*100)+'%';
+      function render(){
+        const h=clampHand(),k=draws.length,s=draws.filter(x=>x==='S').length,N=43-k,R=4-h-s;
+        const invalid=R<0||R>N||N<7;
+        document.getElementById('drawCount').textContent=`${k} 次`;
+        document.getElementById('specialCount').textContent=`${s} 张`;
+        document.getElementById('unknownCount').textContent=`${N} 张`;
+        document.getElementById('remainingSpecial').textContent=`${Math.max(R,0)} 张`;
+        document.getElementById('drawLimit').textContent=`${Math.max(0,36-k)} 次抽牌记录空间`;
+        document.getElementById('undo').disabled=k===0;
+        document.getElementById('undo').style.opacity=k===0?'.45':'1';
+        document.getElementById('drawSpecial').disabled=R<=0||N<=7;
+        document.getElementById('drawOrdinary').disabled=N-R<=0||N<=7;
+        document.querySelectorAll('.draw-actions .action').forEach(b=>{b.style.opacity=b.disabled?'.45':'1';b.style.cursor=b.disabled?'not-allowed':'pointer'});
+        warning.classList.toggle('show',invalid);
+        if(invalid){warning.textContent='记录结果与起手数量不一致，或剩余牌已不足以符合抽牌设定。请检查记录或修改起手数量。';document.getElementById('probability').textContent='—';document.getElementById('fraction').textContent='当前记录不符合牌数限制';document.getElementById('resultCopy').textContent='请撤销冲突的抽牌记录，或修正起手SP牌数量。';document.getElementById('meterFill').style.width='0%'}
+        else{warning.textContent='';const p=1-choose(N-R,7)/choose(N,7);document.getElementById('probability').textContent=fmt(Math.max(0,Math.min(1,p)));document.getElementById('fraction').textContent=`1 − C(${N-R}, 7) / C(${N}, 7) = ${fmt(Math.max(0,Math.min(1,p)))}`;document.getElementById('resultCopy').textContent=R===0?'未看牌池中已没有SP牌，所以这组 7 张不可能含有SP牌。':`未看牌池中有 ${R} 张SP牌和 ${N-R} 张普通牌；从中等可能的 7 张组合计算。`;document.getElementById('meterFill').style.width=`${Math.max(0,Math.min(100,p*100))}%`}
+        historyEl.replaceChildren();if(k===0){const li=document.createElement('li');li.className='empty';li.textContent='尚未记录抽牌';historyEl.append(li)}else draws.forEach((x,i)=>{const li=document.createElement('li');li.className='draw-chip'+(x==='O'?' ordinary-chip':'');const dot=document.createElement('i');const t=document.createElement('span');t.textContent=`${i+1} · ${x==='S'?'特殊':'普通'}`;li.append(dot,t);historyEl.append(li)});
+      }
+      document.getElementById('minus').addEventListener('click',()=>{hand.value=String(Math.max(0,clampHand()-1));render()});
+      document.getElementById('plus').addEventListener('click',()=>{hand.value=String(Math.min(4,clampHand()+1));render()});
+      hand.addEventListener('input',render);hand.addEventListener('change',render);
+      document.getElementById('drawSpecial').addEventListener('click',e=>{if(!e.currentTarget.disabled){draws.push('S');render()}});
+      document.getElementById('drawOrdinary').addEventListener('click',e=>{if(!e.currentTarget.disabled){draws.push('O');render()}});
+      document.getElementById('undo').addEventListener('click',()=>{draws.pop();render()});
+      document.getElementById('reset').addEventListener('click',()=>{draws=[];hand.value='0';render()});
+      render();
+    })();
+  </script>
+</body>
+</html>
